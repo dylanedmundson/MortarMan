@@ -11,7 +11,6 @@ import dy.edmundson.entities.Player;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -24,7 +23,7 @@ public class Game extends Canvas implements Runnable {
     public static final int HEIGHT = 360; //height of screen in pixels
     public static final int SCALE = 3;
     public static final String NAME = "Mortar Man";
-    public static final String RES_PATH = "src/main/res/";
+    public static final String RES_PATH = "MortarMan/res/";
     public static final int PIXELS_PER_TILE = 8;
     public static final int SCREEN_TILES = 64;
     private static final int ICON_IMAGE_WIDTH = 16;
@@ -37,9 +36,12 @@ public class Game extends Canvas implements Runnable {
     //fields
     private JFrame frame;
     private boolean running = false;
+    private int tickCount = 0;
     private ScreenRenderer screenRenderer;
     private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
     private int[] pixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
+    private int xOffset = 0;
+    private int yOffset = 0;
     private InputHandler inputHandler;
 
     public Game () {
@@ -58,7 +60,7 @@ public class Game extends Canvas implements Runnable {
         BufferedImage gameIconImage =
                 new BufferedImage(ICON_IMAGE_WIDTH, ICON_IMAGE_HEIGHT, BufferedImage.TYPE_INT_RGB);
         int[] iconImagePixels = ((DataBufferInt)gameIconImage.getRaster().getDataBuffer()).getData();
-        spriteSheet.getSpriteSheetTiles(4, 5, 0, 0, iconImagePixels);
+        spriteSheet.getSpriteSheetTiles(0, 1, 0, 0, iconImagePixels);
 
         //change grayscale colours to desired colours
         GrayScaleList iconImageGrayScaleList = new GrayScaleList();
@@ -78,19 +80,16 @@ public class Game extends Canvas implements Runnable {
 
     public void init() {
         screenRenderer = new ScreenRenderer(WIDTH,
-                HEIGHT, this.pixels, this);
+                HEIGHT, PIXELS_PER_TILE, this.pixels);
         inputHandler = new InputHandler();
         addKeyListener(inputHandler);
         ColorTileMap colorTileMap = new ColorTileMap();
         colorTileMap.add(Tile.GRASS_ID, Tile.GRASS_REF_COLOR);
         colorTileMap.add(Tile.STONE_ID, Tile.STONE_REF_COLOR);
-        colorTileMap.add(Tile.MORTAR_ID, Tile.MORTAR_REF_COLOR);
-        Level level1 = new Level(RES_PATH + "testCollisionLevel.png", colorTileMap, 64, 64,
-                screenRenderer, inputHandler);
+        Level level1 = new Level("MortarMan/res/testCollisionLevel.png", colorTileMap, 64, 64);
         screenRenderer.setLevel(level1);
         Player player = new Player(level1, 0, 0, screenRenderer, inputHandler);
         level1.addEntity(player);
-        screenRenderer.addPlayer(player);
     }
 
     /**
@@ -139,6 +138,7 @@ public class Game extends Canvas implements Runnable {
     }
 
     public void tick() {
+        tickCount++;
         screenRenderer.tick();
     }
 
@@ -159,13 +159,7 @@ public class Game extends Canvas implements Runnable {
         bs.show();
     }
 
-    // public static void main(String[] args) {
-    //     System.out.println("Working Directory = " + System.getProperty("user.dir"));
-    //     new Game().start();
-    // }
-
-    public void endGame() {
-        running = false;
-        frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+    public static void main(String[] args) {
+        new Game().start();
     }
 }
