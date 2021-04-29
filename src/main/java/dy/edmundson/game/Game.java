@@ -159,10 +159,10 @@ public class Game extends Canvas implements Runnable {
         bs.show();
     }
 
-    // public static void main(String[] args) {
-    //     System.out.println("Working Directory = " + System.getProperty("user.dir"));
-    //     new Game().start();
-    // }
+    public static void main(String[] args) {
+        System.out.println("Working Directory = " + System.getProperty("user.dir"));
+        new Game().start();
+    }
 
     public void endGame() {
         running = false;
